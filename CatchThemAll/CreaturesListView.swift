@@ -40,10 +40,21 @@ struct CreaturesListView: View {
                 .navigationTitle("Pokemon")
                 .toolbar {
                     ToolbarItem(placement: .bottomBar) {
-                        Text("\(creaturesVM.creaturesArray.count) pf \(creaturesVM.count)")
+                        Button("Load All") {
+                            Task {
+                                await creaturesVM.loadAll()
+                            }  // Task
+                        }  // Button
+                        .buttonStyle(.borderedProminent)
+                        
+                    }  // ToolbarItem
+                    
+                    ToolbarItem(placement: .status) {
+                        Text("\(creaturesVM.creaturesArray.count) pf \(creaturesVM.count) Creatures")
                             .font(.headline)
                             .foregroundColor(.red)
                     }  // ToolbarItem
+                    
                 }  // .toolbar
                 
                 if creaturesVM.isLoading {
