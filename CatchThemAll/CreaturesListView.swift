@@ -10,27 +10,45 @@ import SwiftUI
 struct CreaturesListView: View {
     @StateObject var creaturesVM = CreaturesViewModel()
     
-        
+    
     
     var body: some View {
         
         NavigationStack {
-            List(creaturesVM.creaturesArray, id: \.self) { creature in
-                NavigationLink {
-                    DetailView(creature: creature)
-                } label: {
-                    Text(creature.name.capitalized)
-                        .font(.title2)
-                }  // NavigatonLink
+            List(0..<creaturesVM.creaturesArray.count, id: \.self) { index in
+                LazyVStack {
+                    NavigationLink {
+                        DetailView(creature: creaturesVM.creaturesArray[index])
+                    } label: {
+                        Text("\(index + 1)   \(creaturesVM.creaturesArray[index].name.capitalized)")
+                            .font(.title2)
+                    }  // NavigatonLink
+                }  // VStack
+                .onAppear {
+                    if let lastCreature = creaturesVM.creaturesArray.last {
+                        if creaturesVM.creaturesArray[index].name == lastCreature.name && creaturesVM.urlString.hasPrefix("http") {
+                            Task {
+                                await creaturesVM.getData()
+                            }  // Task
+                        }  // if
+                    }  // if let
+                }  // .onAppear
             }  // List
             .listStyle(.plain)
             .padding()
             .navigationTitle("Pokemon")
+            .toolbar {
+                ToolbarItem(placement: .bottomBar) {
+                    Text("\(creaturesVM.creaturesArray.count) pf \(creaturesVM.count)")
+                        .font(.headline)
+                        .foregroundColor(.red)
+                }  // ToolbarItem
+            }  // .toolbar
         }  // NavigationStack
         .task {
             await creaturesVM.getData()
         }  // .task
-
+        
     }  // some View
 }  // CreaturesListView
 
