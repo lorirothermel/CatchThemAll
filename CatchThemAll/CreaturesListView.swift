@@ -9,30 +9,35 @@ import SwiftUI
 
 struct CreaturesListView: View {
     @StateObject var creaturesVM = CreaturesViewModel()
+    @State private var searchText = ""
     
-    
+    var searchResults: [Creature] {
+        if searchText.isEmpty {
+            return creaturesVM.creaturesArray
+        } else {
+            return creaturesVM.creaturesArray.filter {$0.name.capitalized.contains(searchText)}
+        }  // if else
+        
+    }  // searchResults
     
     var body: some View {
         
         NavigationStack {
             ZStack {
-                List(0..<creaturesVM.creaturesArray.count, id: \.self) { index in
+                List(searchResults) { creature in
                     LazyVStack {
                         NavigationLink {
-                            DetailView(creature: creaturesVM.creaturesArray[index])
+                            DetailView(creature: creature)
                         } label: {
-                            Text("\(index + 1)   \(creaturesVM.creaturesArray[index].name.capitalized)")
+                            Text(creature.name.capitalized)
                                 .font(.title2)
                         }  // NavigatonLink
                     }  // VStack
                     .onAppear {
-                        if let lastCreature = creaturesVM.creaturesArray.last {
-                            if creaturesVM.creaturesArray[index].name == lastCreature.name && creaturesVM.urlString.hasPrefix("http") {
-                                Task {
-                                    await creaturesVM.getData()
-                                }  // Task
-                            }  // if
-                        }  // if let
+                        Task {
+                            await creaturesVM.loadNextIfNeeded(creature: creature)
+                        }  // Task
+                        
                     }  // .onAppear
                 }  // List
                 .listStyle(.plain)
@@ -56,6 +61,7 @@ struct CreaturesListView: View {
                     }  // ToolbarItem
                     
                 }  // .toolbar
+                .searchable(text: $searchText)
                 
                 if creaturesVM.isLoading {
                     ProgressView()
