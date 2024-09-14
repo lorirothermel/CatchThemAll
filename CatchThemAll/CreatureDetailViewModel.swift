@@ -18,8 +18,8 @@ class CreatureDetailViewModel: ObservableObject {
     
     
     private struct Returned: Codable {
-        var height: Double
-        var weight: Double
+        var height: Double?
+        var weight: Double?
         var sprites: Sprite
     }  // struct Returned
 
@@ -38,7 +38,7 @@ class CreatureDetailViewModel: ObservableObject {
     }  // struct Other
      
     struct OfficialArtwork: Codable {
-        var front_default: String
+        var front_default: String?
     }  // struct OfficialArtwork
     
     func getData() async {
@@ -55,10 +55,10 @@ class CreatureDetailViewModel: ObservableObject {
                 print("👹 JSON ERROR: Could not decode returned JSON data.")
                 return
             }  // guard let
-            self.height = returned.height
-            self.weight = returned.weight
-//          self.imageURL = returned.sprites.front_default ?? ""
-            self.imageURL = returned.sprites.other.officialArtwork.front_default
+            self.height = returned.height ?? 0.0
+            self.weight = returned.weight ?? 0.0
+//          self.imageURL = returned.sprites.front_default ?? "n/a"
+            self.imageURL = returned.sprites.other.officialArtwork.front_default ?? "n/a"
         } catch {
             print("👹 ERROR: Could not use URL at \(urlString) to get data and response.")
         }  // do catch
