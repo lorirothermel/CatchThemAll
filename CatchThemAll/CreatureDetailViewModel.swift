@@ -24,9 +24,22 @@ class CreatureDetailViewModel: ObservableObject {
     }  // struct Returned
 
     struct Sprite: Codable {
-        var front_default: String
+        var front_default: String?
+        var other: Other
     }  // struct Sprite
+    
+    struct Other: Codable {
+        var officialArtwork: OfficialArtwork
+                
+        enum CodingKeys: String, CodingKey {
+            case officialArtwork = "official-artwork"
+        }  // enum CodingKeys
+        
+    }  // struct Other
      
+    struct OfficialArtwork: Codable {
+        var front_default: String
+    }  // struct OfficialArtwork
     
     func getData() async {
         print("🕸️ We are accessing the url \(urlString)")
@@ -44,7 +57,8 @@ class CreatureDetailViewModel: ObservableObject {
             }  // guard let
             self.height = returned.height
             self.weight = returned.weight
-            self.imageURL = returned.sprites.front_default
+//          self.imageURL = returned.sprites.front_default ?? ""
+            self.imageURL = returned.sprites.other.officialArtwork.front_default
         } catch {
             print("👹 ERROR: Could not use URL at \(urlString) to get data and response.")
         }  // do catch
